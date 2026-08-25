@@ -7,7 +7,7 @@ import { Predictor } from "@/components/sections/Predictor";
 import { DataScience } from "@/components/sections/DataScience";
 import { FloatingWidgets } from "@/components/sections/Chatbot";
 
-const TITLE = "CarPriceAI — Know Your Car's True Worth in Seconds";
+const TITLE = "CarCast — Know Your Car's True Worth in Seconds";
 const DESCRIPTION =
   "AI-powered used car valuation trained on 15,000+ real listings. Get an instant fair price, market comparison and deal analysis.";
 

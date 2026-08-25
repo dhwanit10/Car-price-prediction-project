@@ -24,7 +24,7 @@ export function FloatingWidgets() {
       {open ? (
         <div className="fixed bottom-24 right-6 z-50 w-[20rem] animate-rise surface-card overflow-hidden">
           <div className="hero-gradient flex items-center justify-between px-5 py-4 text-[oklch(0.96_0.01_80)]">
-            <p className="font-display text-base">CarPriceAI Assistant</p>
+            <p className="font-display text-base">CarCast Assistant</p>
             <button type="button" onClick={() => setOpen(false)} aria-label="Close chat">
               <X className="size-4 opacity-75 transition-opacity hover:opacity-100" />
             </button>

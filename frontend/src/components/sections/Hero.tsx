@@ -45,7 +45,7 @@ export function Hero() {
           <div className="absolute inset-x-8 bottom-6 h-8 rounded-[50%] bg-foreground/10 blur-2xl" />
           <img
             src={heroCar}
-            alt="Premium used SUV valued by CarPriceAI"
+            alt="Premium used SUV valued by CarCast"
             width={1200}
             height={800}
             className="animate-float-car w-full drop-shadow-2xl"

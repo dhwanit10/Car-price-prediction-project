@@ -1,6 +1,6 @@
 # The Car Valuator
 
-# 🚗 CarPriceAI - Premium Used Car Price Prediction Platform
+# 🚗 CarCast - Premium Used Car Price Prediction Platform
 
 ## Complete Frontend Development Prompt
 
@@ -8,7 +8,7 @@
 
 ## 📌 Project Overview
 
-**Project Name:** CarPriceAI (or a better name you prefer)
+**Project Name:** CarCast (or a better name you prefer)
 
 **Tagline:** "Know Your Car's True Worth in Seconds"
 
@@ -93,7 +93,7 @@ box-shadow: 0 30px 80px rgba(0,0,0,0.12);
 ### Page Structure
 
 ```
-CarPriceAI
+CarCast
 ├── Navigation Bar (Sticky)
 │   ├── Logo
 │   ├── Navigation Links
@@ -185,7 +185,7 @@ CarPriceAI
 
 ```jsx
 // Sticky, transparent on scroll
-// Logo: Car icon + "CarPriceAI"
+// Logo: Car icon + "CarCast"
 // Links: Home, Features, How It Works, Data Science, GitHub
 
 // Design:
@@ -354,7 +354,7 @@ CarPriceAI
 
 // Placeholder Design:
 ┌──────────────────────────────┐
-│  💬 CarPriceAI Assistant     │
+│  💬 CarCast Assistant     │
 │  "Coming Soon!"              │
 │  Ask about car prices,      │
 │  features, and more.         │

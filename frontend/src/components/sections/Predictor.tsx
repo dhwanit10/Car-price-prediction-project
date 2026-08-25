@@ -28,7 +28,7 @@ import {
   type Transmission,
 } from "@/lib/car-data";
 
-const STORAGE_KEY = "carpriceai.history";
+const STORAGE_KEY = "CarCast.history";
 
 const DEFAULT_CAR: CarInput = {
   brand: "Hyundai",

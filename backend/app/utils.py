@@ -1,5 +1,3 @@
-# app/utils.py
-
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -134,25 +132,25 @@ def format_price(price: float) -> str:
     """Format price in Indian currency format"""
     return f"₹{price:,.0f}"
 
-def get_feature_importance_mapping() -> Dict[str, float]:
-    """
-    Get feature importance mapping from trained model.
-    This should match the features from your trained model.
-    """
-    # These values should be extracted from your trained XGBoost model
-    return {
-        "brand_model": 0.25,
-        "max_power": 0.18,
-        "vehicle_age": 0.12,
-        "brand": 0.10,
-        "engine": 0.08,
-        "km_driven": 0.07,
-        "mileage": 0.05,
-        "seats": 0.04,
-        "fuel_type": 0.03,
-        "transmission_type": 0.02,
-        "seller_type": 0.02,
-        "age_squared": 0.02,
-        "engine_power_interaction": 0.01,
-        "km_per_year": 0.01
-    }
+# def get_feature_importance_mapping() -> Dict[str, float]:
+#     """
+#     Get feature importance mapping from trained model.
+#     This should match the features from your trained model.
+#     """
+#     # These values should be extracted from your trained XGBoost model
+#     return {
+#         "brand_model": 0.25,
+#         "max_power": 0.18,
+#         "vehicle_age": 0.12,
+#         "brand": 0.10,
+#         "engine": 0.08,
+#         "km_driven": 0.07,
+#         "mileage": 0.05,
+#         "seats": 0.04,
+#         "fuel_type": 0.03,
+#         "transmission_type": 0.02,
+#         "seller_type": 0.02,
+#         "age_squared": 0.02,
+#         "engine_power_interaction": 0.01,
+#         "km_per_year": 0.01
+#     }

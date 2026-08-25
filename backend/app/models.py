@@ -1,5 +1,3 @@
-# app/models.py
-
 import joblib
 import pandas as pd
 import numpy as np
@@ -49,23 +47,23 @@ class PricePredictor:
         # Ensure prediction is not negative
         return max(0, prediction)
     
-    def get_feature_importance(self) -> Dict[str, float]:
-        """Get feature importance from the model"""
-        if self._model is None or not hasattr(self._model, 'feature_importances_'):
-            return {}
+    # def get_feature_importance(self) -> Dict[str, float]:
+    #     """Get feature importance from the model"""
+    #     if self._model is None or not hasattr(self._model, 'feature_importances_'):
+    #         return {}
         
-        # Get feature names from preprocessor
-        if self._preprocessor is None:
-            return {}
+    #     # Get feature names from preprocessor
+    #     if self._preprocessor is None:
+    #         return {}
         
-        # Get all feature names
-        feature_names = self._preprocessor.get_feature_names_out()
+    #     # Get all feature names
+    #     feature_names = self._preprocessor.get_feature_names_out()
         
-        # Get importances
-        importances = self._model.feature_importances_
+    #     # Get importances
+    #     importances = self._model.feature_importances_
         
-        # Create mapping
-        return dict(zip(feature_names, importances))
+    #     # Create mapping
+    #     return dict(zip(feature_names, importances))
     
     @property
     def is_loaded(self) -> bool:

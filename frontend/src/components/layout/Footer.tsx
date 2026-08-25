@@ -11,7 +11,7 @@ export function Footer() {
             <span className="flex size-9 items-center justify-center rounded-xl bg-primary/25 text-primary">
               <Car className="size-5" />
             </span>
-            <span className="font-display text-lg font-semibold">CarPriceAI</span>
+            <span className="font-display text-lg font-semibold">CarCast</span>
           </div>
           <p className="mt-4 max-w-xs text-sm opacity-70">
             An XGBoost valuation engine trained on 15,000+ Cardekho listings, wrapped in a calm,
@@ -70,7 +70,7 @@ export function Footer() {
       </div>
 
       <div className="border-t border-[oklch(1_0_0/0.1)] py-6 text-center text-xs opacity-55">
-        © {new Date().getFullYear()} CarPriceAI · Estimates are indicative, not an offer to buy.
+        © {new Date().getFullYear()} CarCast · Estimates are indicative, not an offer to buy.
       </div>
     </footer>
   );

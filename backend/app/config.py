@@ -1,5 +1,3 @@
-# app/config.py
-
 import os
 from pathlib import Path
 from typing import List, Dict
@@ -12,7 +10,8 @@ MODEL_PATH = BASE_DIR / "models" / "full_pipeline.pkl"
 
 # Data paths
 DATA_DIR = BASE_DIR / "app" / "data"
-BRANDS_MODELS_PATH = DATA_DIR / "brands_models.json"
+BRANDS_PATH = DATA_DIR / "brands.json"
+BMODELS_PATH = DATA_DIR / "models.json"
 FEATURE_IMPORTANCE_PATH = DATA_DIR / "feature_importance.json"
 
 # Luxury brands list
@@ -28,10 +27,10 @@ ENGINE_BINS = [0, 1500, 2500, 3500, 6000]
 ENGINE_LABELS = ['Small', 'Mid', 'Large', 'Luxury']
 
 # API settings
-API_TITLE = "CarPriceAI - Used Car Price Prediction API"
+API_TITLE = "CarCast - Used Car Price Prediction API"
 API_VERSION = "2.0.0"
 API_DESCRIPTION = """
-## CarPriceAI API
+## CarCast API
 
 A comprehensive API for used car price prediction with advanced features.
 
@@ -50,8 +49,8 @@ MODEL_METRICS = {
     "r2_score": 0.9459,
     "mae": 97149.24,
     "rmse": 201768.88,
-    "training_samples": 12192,
-    "test_samples": 3048,
-    "features_count": 164,
+    "training_samples": 12328,
+    "test_samples": 3083,
+    "features_count": 295,
     "description": "XGBoost model trained on 15,240 used car listings with 11 base features and 9 engineered features"
 }

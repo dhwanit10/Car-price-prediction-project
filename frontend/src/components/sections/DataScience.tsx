@@ -14,17 +14,17 @@ const LINKS = [
   {
     icon: Github,
     label: "Training notebooks",
-    href: "https://github.com/carpriceai/used-car-price-prediction",
+    href: "https://github.com/dhwanit10/Car-price-prediction-project/tree/main/backend/notebooks",
   },
   {
     icon: Database,
     label: "Cardekho dataset",
-    href: "https://www.kaggle.com/datasets/manishkr1754/cardekho-used-car-data",
+    href: "https://github.com/dhwanit10/Car-price-prediction-project/tree/main/backend/data",
   },
   {
     icon: BookOpen,
     label: "Model documentation",
-    href: "https://github.com/carpriceai/used-car-price-prediction#readme",
+    href: "https://github.com/dhwanit10/Car-price-prediction-project/tree/main/backend/notebooks",
   },
 ];
 

@@ -30,7 +30,7 @@ export function Navbar() {
             <Car className="size-5" />
           </span>
           <span className="font-display text-lg font-semibold tracking-tight">
-            CarPrice<span className="text-primary">AI</span>
+            Car<span className="text-primary">Cast</span>
           </span>
         </a>
 

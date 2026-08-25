@@ -1,5 +1,3 @@
-# app/schemas.py
-
 from pydantic import BaseModel, Field, validator
 from typing import Optional, List, Dict, Any
 from enum import Enum
@@ -147,37 +145,26 @@ class DealAnalysisResponse(PriceResponse):
             }
         }
 
-class PredictionHistoryItem(BaseModel):
-    """Single history item"""
-    
-    id: str
-    car_details: Dict[str, Any]
-    prediction: PriceResponse
-    timestamp: datetime
-
-class PredictionHistoryResponse(BaseModel):
-    """Response for prediction history"""
-    
-    total: int
-    history: List[PredictionHistoryItem]
 
 # ============================================
 # Model Info Schemas
 # ============================================
 
-class FeatureImportanceItem(BaseModel):
-    """Feature importance item for frontend display"""
+# class FeatureImportanceItem(BaseModel):
+#     """Feature importance item for frontend display"""
     
-    feature: str = Field(..., description="Original feature name (not encoded)")
-    importance: float = Field(..., description="Feature importance score (0-1)")
-    category: str = Field(..., description="Feature category: 'base' or 'engineered'")
+#     feature: str = Field(..., description="Original feature name (not encoded)")
+#     importance: float = Field(..., description="Feature importance score (0-1)")
+#     category: str = Field(..., description="Feature category: 'base' or 'engineered'")
 
-class FeatureImportanceResponse(BaseModel):
-    """Feature importance response"""
+# class FeatureImportanceResponse(BaseModel):
+#     """Feature importance response"""
     
-    feature_importance: List[FeatureImportanceItem]
-    total_features: int
-    top_features: List[FeatureImportanceItem]
+#     feature_importance: List[FeatureImportanceItem]
+#     total_features: int
+#     top_features: List[FeatureImportanceItem]
+
+
 
 class ModelMetricsResponse(BaseModel):
     """Model performance metrics"""
@@ -191,13 +178,6 @@ class ModelMetricsResponse(BaseModel):
     features_count: int
     description: str
 
-class BrandsModelsResponse(BaseModel):
-    """Brands and models data"""
-    
-    brands: List[str]
-    models_by_brand: Dict[str, List[str]]
-    total_brands: int
-    total_models: int
 
 # ============================================
 # Health Check
