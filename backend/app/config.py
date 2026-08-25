@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+from typing import List, Dict
 
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,11 +10,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Model paths
 MODEL_PATH = BASE_DIR / "models" / "full_pipeline.pkl"
 
-# Luxury brands list (must match what was used in training)
+# Data paths
+DATA_DIR = BASE_DIR / "app" / "data"
+BRANDS_MODELS_PATH = DATA_DIR / "brands_models.json"
+FEATURE_IMPORTANCE_PATH = DATA_DIR / "feature_importance.json"
+
+# Luxury brands list
 LUXURY_BRANDS = [
     'Mercedes-Benz', 'BMW', 'Audi', 'Land Rover',
     'Jaguar', 'Porsche', 'Lexus', 'Volvo', 'Mini',
-    'Mercedes-AMG', 'Maserati', 'Bentley', 'Rolls-Royce'
+    'Mercedes-AMG', 'Maserati', 'Bentley', 'Rolls-Royce',
+    'Ferrari', 'Lamborghini', 'Mclaren', 'Aston Martin'
 ]
 
 # Engine category bins
@@ -21,39 +28,30 @@ ENGINE_BINS = [0, 1500, 2500, 3500, 6000]
 ENGINE_LABELS = ['Small', 'Mid', 'Large', 'Luxury']
 
 # API settings
-API_TITLE = "Used Car Price Prediction API"
-API_VERSION = "1.0.0"
+API_TITLE = "CarPriceAI - Used Car Price Prediction API"
+API_VERSION = "2.0.0"
 API_DESCRIPTION = """
-## Used Car Price Prediction API
+## CarPriceAI API
 
-This API predicts the fair market price of used cars based on their characteristics.
+A comprehensive API for used car price prediction with advanced features.
 
-### Features used:
-- **Brand & Model**: The make and specific model of the car
-- **Vehicle Age**: How old the car is (in years)
-- **KM Driven**: Total kilometers driven
-- **Fuel Type**: Petrol, Diesel, CNG, LPG, Electric
-- **Transmission**: Manual or Automatic
-- **Engine**: Engine capacity in CC
-- **Max Power**: Maximum horsepower
-- **Mileage**: Fuel efficiency (km/l)
-- **Seats**: Number of seats
-- **Seller Type**: Individual, Dealer, or Trustmark Dealer
-
-### Engineered Features:
-The model uses additional engineered features derived from the inputs:
-- Age squared (for non-linear depreciation)
-- KM driven per year (usage intensity)
-- Power per CC (engine efficiency)
-- Mileage per HP (fuel efficiency context)
-- Age-KM interaction
-- Engine-Power interaction
-- Engine category (Small, Mid, Large, Luxury)
-- Brand group (Luxury vs Mass Market)
-- Brand-Model combination
-
-### Response:
-- `predicted_price`: The predicted price in rupees
-- `predicted_price_lakhs`: The predicted price in lakhs
-- `price_category`: The price range category
+### Features:
+- **Car Price Prediction**: Predict fair market price
+- **Deal Analysis**: Compare predicted vs asking price
+- **Model Metrics**: View model performance
+- **Feature Importance**: Understand what drives prices
+- **Brand/Model Data**: Get available brands and models
+- **Prediction History**: Track past predictions
 """
+
+# Model performance metrics (from your training)
+MODEL_METRICS = {
+    "model_name": "XGBoost Regressor",
+    "r2_score": 0.9459,
+    "mae": 97149.24,
+    "rmse": 201768.88,
+    "training_samples": 12192,
+    "test_samples": 3048,
+    "features_count": 164,
+    "description": "XGBoost model trained on 15,240 used car listings with 11 base features and 9 engineered features"
+}

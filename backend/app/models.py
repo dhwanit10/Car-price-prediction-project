@@ -2,6 +2,8 @@
 
 import joblib
 import pandas as pd
+import numpy as np
+from typing import Dict, Any
 from app.config import MODEL_PATH
 
 class PricePredictor:
@@ -9,6 +11,8 @@ class PricePredictor:
     
     _instance = None
     _pipeline = None
+    _model = None
+    _preprocessor = None
     
     def __new__(cls):
         if cls._instance is None:
@@ -21,6 +25,12 @@ class PricePredictor:
         try:
             self._pipeline = joblib.load(MODEL_PATH)
             print("✅ Model loaded successfully!")
+            
+            # Extract components for potential individual use
+            if hasattr(self._pipeline, 'named_steps'):
+                self._model = self._pipeline.named_steps.get('model')
+                self._preprocessor = self._pipeline.named_steps.get('preprocessor')
+                
         except FileNotFoundError:
             print(f"❌ Model not found at {MODEL_PATH}")
             raise
@@ -38,6 +48,24 @@ class PricePredictor:
         
         # Ensure prediction is not negative
         return max(0, prediction)
+    
+    def get_feature_importance(self) -> Dict[str, float]:
+        """Get feature importance from the model"""
+        if self._model is None or not hasattr(self._model, 'feature_importances_'):
+            return {}
+        
+        # Get feature names from preprocessor
+        if self._preprocessor is None:
+            return {}
+        
+        # Get all feature names
+        feature_names = self._preprocessor.get_feature_names_out()
+        
+        # Get importances
+        importances = self._model.feature_importances_
+        
+        # Create mapping
+        return dict(zip(feature_names, importances))
     
     @property
     def is_loaded(self) -> bool:
