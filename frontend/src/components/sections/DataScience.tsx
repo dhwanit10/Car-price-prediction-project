@@ -16,7 +16,7 @@ const LINKS = [
   {
     icon: Database,
     label: "Cardekho dataset",
-    href: "https://github.com/dhwanit10/Car-price-prediction-project/tree/main/backend/data",
+    href: "https://www.kaggle.com/datasets/dhwanit10/car-price-dataset",
   },
   {
     icon: BookOpen,

@@ -52,9 +52,9 @@ export function Navbar({ apiStatus, apiVersion }: { apiStatus: boolean | null; a
           <span
             className={`hidden rounded-full px-3 py-1 font-accent text-xs md:inline-flex ${
               apiStatus === null
-                ? "bg-secondary text-muted-foreground"
+                ? "bg-ring text-muted-foreground"
                 : apiStatus
-                  ? "bg-[oklch(0.87_0.08_140)] text-[oklch(0.35_0.06_140)]"
+                  ? "bg-secondary text-primary"
                   : "bg-destructive/15 text-destructive"
             }`}
           >

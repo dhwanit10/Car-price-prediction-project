@@ -43,7 +43,7 @@ export function Footer() {
               <Linkedin className="size-4" />
             </a>
             <a
-              href="https://www.kaggle.com/datasets/manishkr1754/cardekho-used-car-data"
+              href="https://www.kaggle.com/datasets/dhwanit10/car-price-dataset"
               target="_blank"
               rel="noreferrer"
               className="inline-flex size-9 items-center justify-center rounded-lg bg-[oklch(1_0_0/0.1)] transition-colors hover:bg-primary hover:text-[oklch(0.2_0.01_60)]"
