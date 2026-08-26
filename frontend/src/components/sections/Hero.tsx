@@ -1,7 +1,10 @@
 import { ArrowRight, Sparkles } from "lucide-react";
 import heroCar from "@/assets/hero-car.png";
 
-export function Hero() {
+export function Hero({ modelName, r2Score }: { modelName?: string; r2Score?: number }) {
+  const badgeModel = modelName ?? "XGBoost";
+  const badgeR2 = (r2Score ?? 0.9459).toFixed(4);
+
   return (
     <section id="home" className="relative overflow-hidden pt-[72px]">
       <div className="pointer-events-none absolute -right-40 -top-32 size-[36rem] rounded-full bg-primary/12 blur-3xl" />
@@ -11,7 +14,7 @@ export function Hero() {
         <div className="animate-rise">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 font-accent text-xs tracking-wide text-primary">
             <Sparkles className="size-3.5" />
-            XGBoost · R² 0.9459
+            {badgeModel} · R² {badgeR2}
           </span>
 
           <h1 className="mt-6 font-display text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">

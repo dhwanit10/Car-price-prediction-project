@@ -1,14 +1,11 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { BookOpen, Database, Github } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
+import type { ModelInfoResponse } from "@/lib/api";
 import { FEATURE_IMPORTANCE } from "@/lib/car-data";
 
-const METRICS = [
-  { label: "R² score", value: "0.9459", note: "Test set" },
-  { label: "MAE", value: "₹97,149", note: "Mean absolute error" },
-  { label: "RMSE", value: "₹1,84,320", note: "Root mean squared error" },
-  { label: "Model", value: "XGBoost", note: "400 estimators, depth 8" },
-];
+const DEFAULT_DESCRIPTION =
+  "Gradient-boosted trees over 15,411 listings, with target encoding for brand and model and log-transformed prices.";
 
 const LINKS = [
   {
@@ -28,22 +25,59 @@ const LINKS = [
   },
 ];
 
-export function DataScience() {
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+export function DataScience({
+  modelInfo,
+  apiError,
+}: {
+  modelInfo?: ModelInfoResponse;
+  apiError?: string | null;
+}) {
+  const metrics = modelInfo?.model_metrics;
+  const metricCards = metrics
+    ? [
+        { label: "R² score", value: metrics.r2_score.toFixed(4), note: "Test set" },
+        { label: "MAE", value: formatCurrency(metrics.mae), note: "Mean absolute error" },
+        { label: "RMSE", value: formatCurrency(metrics.rmse), note: "Root mean squared error" },
+        {
+          label: "Model",
+          value: metrics.model_name,
+          note: `${metrics.features_count} features`,
+        },
+      ]
+    : [
+        { label: "R² score", value: "0.9459", note: "Test set" },
+        { label: "MAE", value: "₹97,149", note: "Mean absolute error" },
+        { label: "RMSE", value: "₹1,84,320", note: "Root mean squared error" },
+        { label: "Model", value: "XGBoost", note: "400 estimators, depth 8" },
+      ];
+
   return (
     <section id="data-science" className="border-y border-border bg-secondary/60 py-20">
       <div className="mx-auto max-w-6xl px-5">
         <Reveal>
           <h2 className="max-w-xl font-display text-3xl sm:text-4xl">The data science behind it</h2>
           <p className="mt-3 max-w-xl text-muted-foreground">
-            Gradient-boosted trees over 15,411 listings, with target encoding for brand and model
-            and log-transformed prices.
+            {metrics?.description ?? DEFAULT_DESCRIPTION}
           </p>
+          {apiError ? (
+            <p className="mt-2 text-sm text-destructive">
+              Live model metrics are unavailable: {apiError}
+            </p>
+          ) : null}
         </Reveal>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <Reveal>
             <div className="grid h-full gap-5 sm:grid-cols-2">
-              {METRICS.map((metric) => (
+              {metricCards.map((metric) => (
                 <div key={metric.label} className="surface-card lift p-6">
                   <p className="font-accent text-xs uppercase tracking-[0.18em] text-muted-foreground">
                     {metric.label}

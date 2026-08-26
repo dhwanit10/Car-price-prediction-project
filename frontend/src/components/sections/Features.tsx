@@ -1,14 +1,26 @@
 import { Gauge, Zap, Database, Users } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
+import type { ModelMetrics } from "@/lib/api";
 
-const ITEMS = [
-  { icon: Gauge, stat: "94.6%", label: "Model accuracy", note: "R² on held-out test data" },
-  { icon: Zap, stat: "<1s", label: "Instant estimates", note: "No sign-up, no waiting" },
-  { icon: Database, stat: "15,411", label: "Real listings", note: "Cardekho market dataset" },
-  { icon: Users, stat: "22k+", label: "Valuations run", note: "By buyers and sellers" },
-];
+export function Features({ modelMetrics }: { modelMetrics?: ModelMetrics }) {
+  const listingCount = modelMetrics ? modelMetrics.training_samples + modelMetrics.test_samples : 15411;
+  const items = [
+    {
+      icon: Gauge,
+      stat: modelMetrics ? `${(modelMetrics.r2_score * 100).toFixed(1)}%` : "94.6%",
+      label: "Model accuracy",
+      note: "R² on held-out test data",
+    },
+    { icon: Zap, stat: "<1s", label: "Instant estimates", note: "No sign-up, no waiting" },
+    {
+      icon: Database,
+      stat: listingCount.toLocaleString("en-IN"),
+      label: "Real listings",
+      note: "Cardekho market dataset",
+    },
+    { icon: Users, stat: "22k+", label: "Valuations run", note: "By buyers and sellers" },
+  ];
 
-export function Features() {
   return (
     <section id="features" className="mx-auto max-w-6xl px-5 py-20">
       <Reveal>
@@ -18,7 +30,7 @@ export function Features() {
       </Reveal>
 
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {ITEMS.map((item, i) => (
+        {items.map((item, i) => (
           <Reveal key={item.label} delay={i * 90}>
             <article className="surface-card lift h-full p-6">
               <span className="flex size-11 items-center justify-center rounded-xl bg-primary/12 text-primary">
