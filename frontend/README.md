@@ -1,223 +1,30 @@
-# The Car Valuator
+# Frontend (React + TypeScript)
 
-# 🚗 CarCast - Premium Used Car Price Prediction Platform
+This frontend is the user interface for the CarCast used-car valuation app. It connects to the FastAPI backend and provides prediction, deal analysis, and prediction history in a clean single-page experience.
 
-## Complete Frontend Development Prompt
+## Quick setup
 
----
-
-## 📌 Project Overview
-
-**Project Name:** CarCast (or a better name you prefer)
-
-**Tagline:** "Know Your Car's True Worth in Seconds"
-
-**Description:** A premium, elegant, and minimalistic web application that predicts used car prices using machine learning. The design should feel luxurious and trustworthy, avoiding blue/violet tones, using warm, sophisticated colors instead.
-
----
-
-## 🎨 Design Philosophy
-
-### Color Palette (NO Blue or Violet)
-
-**Primary Colors:**
-- Warm Gold/Amber: `#C8974D` (luxury accent)
-- Deep Charcoal: `#1A1A1A` or `#2D2D2D` (text, headers)
-- Warm White: `#FDFBF7` or `#FFFCF8` (background)
-- Rich Cream: `#FAF6F0` (card backgrounds)
-- Soft Coral: `#E87A5D` (CTA buttons, highlights)
-- Muted Sage: `#8BA888` (success indicators)
-- Warm Gray: `#6B6B6B` (secondary text)
-- Pure White: `#FFFFFF` (cards, sections)
-
-**Color Psychology:**
-- Gold/Amber: Trust, value, premium feel
-- Coral: Action, confidence, warmth
-- Charcoal: Sophistication, readability
-- Cream/Warm White: Elegance, readability
-
-**Gradient Options:**
-```css
-/* Hero Gradient */
-background: linear-gradient(135deg, #2D2D2D 0%, #4A3728 100%);
-
-/* Card Gradients */
-background: linear-gradient(145deg, #FFFFFF, #FAF6F0);
-
-/* Button Gradient */
-background: linear-gradient(135deg, #E87A5D, #D4684A);
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-### Typography
+## Environment variable
 
-```css
-/* Headings */
-font-family: 'Playfair Display', serif; /* Elegant, premium feel */
+Set backend base URL in [.env](D:/Car-price-prediction-project.worktrees/car-price-prediction-documentation/frontend/.env):
 
-/* Body */
-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-
-/* Accent */
-font-family: 'DM Sans', sans-serif;
+```env
+VITE_API_BASE_URL=http://localhost:8000
 ```
 
-### Design Elements
+## Brief features
 
-1. **Subtle Animations:**
-   - Fade-in on scroll
-   - Smooth hover transitions
-   - Loading shimmer effects
-   - Number counting animations
-   - Slide-in predictions
-
-2. **Shadows:**
-```css
-/* Card Shadows */
-box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-
-/* Hover Shadows */
-box-shadow: 0 30px 80px rgba(0,0,0,0.12);
-```
-
-3. **Border Radius:**
-- Cards: `border-radius: 16px`
-- Buttons: `border-radius: 8px`
-- Inputs: `border-radius: 10px`
-- Images: `border-radius: 12px`
-
----
-
-## 📱 Website Architecture
-
-### Page Structure
-
-```
-CarCast
-├── Navigation Bar (Sticky)
-│   ├── Logo
-│   ├── Navigation Links
-│   └── GitHub Link
-│
-├── Hero Section
-│   ├── Animated Car Illustration
-│   ├── Headline
-│   ├── Sub-headline
-│   └── CTA Button
-│
-├── Features Section (Trust Signals)
-│   ├── Accuracy Badge
-│   ├── Speed Badge
-│   ├── Data Source Badge
-│   └── Users Badge
-│
-├── Prediction Section (Main)
-│   ├── Car Details Form
-│   │   ├── Brand (Dropdown with search)
-│   │   ├── Model (Dropdown, filtered by brand)
-│   │   ├── Vehicle Age (Slider + Input)
-│   │   ├── KM Driven (Slider + Input)
-│   │   ├── Fuel Type (Chip selector)
-│   │   ├── Transmission (Toggle/Chip selector)
-│   │   ├── Mileage (Input with unit)
-│   │   ├── Engine CC (Input with unit)
-│   │   ├── Max Power (Input with unit)
-│   │   ├── Seats (Input)
-│   │   └── Seller Type (Dropdown)
-│   │
-│   ├── Sample Data Button
-│   │   └── Fill sample data on click
-│   │
-│   └── Predict Button (Animated)
-│
-├── Results Section (Animated on prediction)
-│   ├── Price Card (Premium design)
-│   │   ├── Estimated Price (Large, animated counter)
-│   │   ├── Price Range (Min - Max)
-│   │   └── Confidence Badge
-│   │
-│   ├── Price Breakdown Graph
-│   │   ├── Bar chart comparing features
-│   │   └── Feature importance visualization
-│   │
-│   └── Deal Analyzer
-│       ├── Asking Price Input
-│       ├── Deal Status (Good/Fair/Overpriced)
-│       └── Savings/Loss Amount
-│
-├── History Section
-│   ├── Recent Predictions List
-│   ├── Timestamp
-│   └── Clear History Button
-│
-├── Data Science Behind Section
-│   ├── Model Performance Metrics
-│   │   ├── R² Score
-│   │   ├── MAE
-│   │   └── RMSE
-│   │
-│   ├── Feature Importance Graph
-│   ├── Actual vs Predicted Scatter Plot
-│   ├── Jupyter Notebook Embed (or link)
-│   └── Dataset & GitHub Links
-│
-├── Chatbot Section (Placeholder)
-│   ├── Chat Interface
-│   ├── Quick Questions
-│   └── "Coming Soon" Banner
-│
-├── Footer
-│   ├── Developer Info
-│   ├── GitHub Link
-│   ├── LinkedIn Link
-│   └── Tech Stack Icons
-│
-└── Floating Elements
-    ├── Back to Top Button
-    └── Prediction History Toggle
-```
-
----
-
-## 🎯 Detailed Component Specifications
-
-### 1. Navigation Bar
-
-```jsx
-// Sticky, transparent on scroll
-// Logo: Car icon + "CarCast"
-// Links: Home, Features, How It Works, Data Science, GitHub
-
-// Design:
-- Height: 72px
-- Background: Transparent -> Solid white on scroll
-- Logo: Warm gold accent
-- Active link: Gold underline animation
-```
-
-### 2. Hero Section
-
-```jsx
-// Full viewport height, animated background
-// Left side: Text content
-// Right side: Animated car illustration (SVG/PNG with floating animation)
-
-// Text:
-- Headline: "Know Your Car's True Worth"
-- Sub-headline: "Get an accurate, AI-powered valuation in seconds"
-- CTA: "Get Your Estimate →" (Coral button with hover animation)
-
-// Background: Subtle gradient with floating car silhouettes
-```
-
-### 3. Car Details Form
-
-**Form Layout:** Two-column grid on desktop, single column on mobile
-
-**Fields:**
-
-1. **Brand** (Dropdown with search)
-   - Options: Maruti, Hyundai, Toyota, Honda, Ford, Mahindra, Tata, BMW, Audi, Mercedes-Benz, etc.
+- Car price prediction from 11 user inputs
+- Asking-price deal analysis
+- Dynamic brand/model loading from backend APIs
+- Basic API health/model readiness feedback
+- Local prediction history for quick reuse
    - Searchable dropdown with icons
 
 2. **Model** (Dropdown, filtered by brand)
