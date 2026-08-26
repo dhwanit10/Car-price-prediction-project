@@ -326,9 +326,9 @@ async def root():
             "predict": "/predict",
             "predict_with_asking": "/predict-with-asking",
             "brands": "/brands",
+            "brand_models": "/brands/{brand}/models",
             "model_metrics": "/model-metrics",
-            "feature_importance": "/feature-importance",
-            "history": "/history"
+            "model_info": "/model-info"
         }
     }
 

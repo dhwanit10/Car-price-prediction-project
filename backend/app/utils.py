@@ -103,8 +103,8 @@ def get_deal_status(predicted_price: float, asking_price: float) -> Tuple[str, s
 def get_price_range(prediction: float, mae: float = 97149) -> Dict[str, float]:
     """Calculate price range with confidence interval"""
     return {
-        "low": max(0, prediction - (mae * 1.5)),
-        "high": prediction + (mae * 1.5)
+        "low": max(0, prediction - (mae * 0.7)),
+        "high": prediction + (mae * 0.7)
     }
 
 def calculate_confidence(prediction: float, features: pd.DataFrame) -> float:
