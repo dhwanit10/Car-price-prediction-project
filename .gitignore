@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python build
+*.egg-info/
+build/
+dist/
+
+# Data
+*.csv
+*.parquet
+*.xlsx
+*.db
+*.sqlite
+
+# ML models
+# Uncomment these only if your model is too large for GitHub
+# models/*.pkl
+# models/*.joblib
+
+# FastAPI
+*.log
+
+# React
+node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
