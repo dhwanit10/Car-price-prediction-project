@@ -8,7 +8,7 @@ const LINKS = [
   { label: "Data Science", href: "#data-science" },
 ];
 
-export function Navbar() {
+export function Navbar({ apiStatus, apiVersion }: { apiStatus: boolean | null; apiVersion?: string }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -48,15 +48,33 @@ export function Navbar() {
           ))}
         </ul>
 
-        <a
-          href="https://github.com/dhwanit10/Car-price-prediction-project"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-2 font-accent text-sm transition-colors hover:border-primary hover:text-primary"
-        >
-          <Github className="size-4" />
-          <span className="hidden sm:inline">GitHub</span>
-        </a>
+        <div className="flex items-center gap-3">
+          <span
+            className={`hidden rounded-full px-3 py-1 font-accent text-xs md:inline-flex ${
+              apiStatus === null
+                ? "bg-secondary text-muted-foreground"
+                : apiStatus
+                  ? "bg-[oklch(0.87_0.08_140)] text-[oklch(0.35_0.06_140)]"
+                  : "bg-destructive/15 text-destructive"
+            }`}
+          >
+            {apiStatus === null
+              ? "Checking API..."
+              : apiStatus
+                ? `API ${apiVersion ?? ""}`.trim()
+                : "Model unavailable"}
+          </span>
+
+          <a
+            href="https://github.com/dhwanit10/Car-price-prediction-project"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-2 font-accent text-sm transition-colors hover:border-primary hover:text-primary"
+          >
+            <Github className="size-4" />
+            <span className="hidden sm:inline">GitHub</span>
+          </a>
+        </div>
       </nav>
     </header>
   );

@@ -13,20 +13,24 @@ import { Reveal } from "@/components/Reveal";
 import { Field, inputClass, RangeInput, ChipGroup } from "@/components/ui-kit/Field";
 import { useCountUp } from "@/hooks/useReveal";
 import {
-  BRANDS,
-  BRAND_MODELS,
   FUEL_TYPES,
   SAMPLE_CARS,
   SELLER_TYPES,
   formatINR,
   formatLakhs,
-  predictPrice,
   type CarInput,
   type FuelType,
-  type Prediction,
   type SellerType,
   type Transmission,
 } from "@/lib/car-data";
+import {
+  fetchBrandModels,
+  fetchBrands,
+  predictCar,
+  predictCarWithAsking,
+  type PredictResponse,
+  type PredictWithAskingResponse,
+} from "@/lib/api";
 
 const STORAGE_KEY = "CarCast.history";
 
@@ -44,24 +48,166 @@ const DEFAULT_CAR: CarInput = {
   seller_type: "Dealer",
 };
 
+type PredictionResult = {
+  id: string;
+  input: CarInput;
+  predicted_price: number;
+  predicted_price_lakhs: number;
+  price_category: string;
+  price_range: { low: number; high: number };
+  confidence_score: number;
+  timestamp: string;
+  createdAt: number;
+  asking_price?: number;
+  price_difference?: number;
+  deal_status?: string;
+  deal_message?: string;
+  savings?: number;
+};
+
+function toPredictionResult(
+  input: CarInput,
+  response: PredictResponse | PredictWithAskingResponse,
+): PredictionResult {
+  const parsedTime = Date.parse(response.timestamp);
+  return {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    input,
+    predicted_price: response.predicted_price,
+    predicted_price_lakhs: response.predicted_price_lakhs,
+    price_category: response.price_category,
+    price_range: response.price_range,
+    confidence_score: response.confidence_score,
+    timestamp: response.timestamp,
+    createdAt: Number.isNaN(parsedTime) ? Date.now() : parsedTime,
+    asking_price: "asking_price" in response ? response.asking_price : undefined,
+    price_difference: "price_difference" in response ? response.price_difference : undefined,
+    deal_status: "deal_status" in response ? response.deal_status : undefined,
+    deal_message: "deal_message" in response ? response.deal_message : undefined,
+    savings: "savings" in response ? response.savings : undefined,
+  };
+}
+
 export function Predictor() {
   const [car, setCar] = useState<CarInput>(DEFAULT_CAR);
+  const [brandOptions, setBrandOptions] = useState<string[]>([]);
+  const [modelOptions, setModelOptions] = useState<string[]>([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
+  const [modelsLoading, setModelsLoading] = useState(false);
+  const [brandsError, setBrandsError] = useState<string | null>(null);
+  const [modelsError, setModelsError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<Prediction | null>(null);
-  const [history, setHistory] = useState<Prediction[]>([]);
+  const [askingLoading, setAskingLoading] = useState(false);
+  const [predictError, setPredictError] = useState<string | null>(null);
+  const [askingError, setAskingError] = useState<string | null>(null);
+  const [result, setResult] = useState<PredictionResult | null>(null);
+  const [history, setHistory] = useState<PredictionResult[]>([]);
   const [asking, setAsking] = useState("");
   const [sampleIndex, setSampleIndex] = useState(0);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setHistory(JSON.parse(raw) as Prediction[]);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Array<
+          PredictionResult & { confidence?: number; timestamp?: string; createdAt?: number }
+        >;
+        const normalized = parsed.map((entry) => {
+          const fallbackTime = entry.timestamp ? Date.parse(entry.timestamp) : NaN;
+          return {
+            ...entry,
+            confidence_score: entry.confidence_score ?? entry.confidence ?? 0,
+            createdAt:
+              entry.createdAt ??
+              (Number.isNaN(fallbackTime) ? Date.now() : fallbackTime),
+            predicted_price_lakhs:
+              entry.predicted_price_lakhs ?? Number((entry.predicted_price / 100000).toFixed(2)),
+          };
+        });
+        setHistory(normalized);
+      }
     } catch {
       /* ignore corrupt storage */
     }
   }, []);
 
-  const persist = (next: Prediction[]) => {
+  useEffect(() => {
+    let active = true;
+    setBrandsLoading(true);
+
+    const loadBrands = async () => {
+      try {
+        const brands = await fetchBrands();
+        if (!active) return;
+
+        setBrandOptions(brands);
+        setBrandsError(null);
+        setCar((prev) => {
+          if (brands.includes(prev.brand)) return prev;
+          return { ...prev, brand: brands[0] ?? "", model: "" };
+        });
+      } catch (error) {
+        if (!active) return;
+
+        setBrandsError(error instanceof Error ? error.message : "Failed to fetch brands.");
+        setBrandOptions([]);
+      } finally {
+        if (active) setBrandsLoading(false);
+      }
+    };
+
+    void loadBrands();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!car.brand) {
+      setModelOptions([]);
+      setModelsError(null);
+      return () => {
+        active = false;
+      };
+    }
+
+    setModelsLoading(true);
+    setModelsError(null);
+
+    const selectedBrand = car.brand;
+    const loadModels = async () => {
+      try {
+        const models = await fetchBrandModels(selectedBrand);
+        if (!active) return;
+
+        setModelOptions(models);
+        setCar((prev) => {
+          if (prev.brand !== selectedBrand) return prev;
+          if (models.includes(prev.model)) return prev;
+          return { ...prev, model: models[0] ?? "" };
+        });
+      } catch (error) {
+        if (!active) return;
+
+        setModelsError(error instanceof Error ? error.message : "Failed to fetch models.");
+        setModelOptions([]);
+        setCar((prev) => (prev.brand === selectedBrand ? { ...prev, model: "" } : prev));
+      } finally {
+        if (active) setModelsLoading(false);
+      }
+    };
+
+    void loadModels();
+
+    return () => {
+      active = false;
+    };
+  }, [car.brand]);
+
+  const persist = (next: PredictionResult[]) => {
     setHistory(next);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -70,10 +216,22 @@ export function Predictor() {
     }
   };
 
+  const pushHistory = (entry: PredictionResult) => {
+    setHistory((prev) => {
+      const next = [entry, ...prev].slice(0, 20);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        /* storage unavailable */
+      }
+      return next;
+    });
+  };
+
   const set = <K extends keyof CarInput>(key: K, value: CarInput[K]) =>
     setCar((prev) => ({ ...prev, [key]: value }));
 
-  const models = BRAND_MODELS[car.brand] ?? [];
+  const canSubmit = car.brand.length > 0 && car.model.length > 0 && !brandsLoading && !modelsLoading;
 
   const fillSample = () => {
     const sample = SAMPLE_CARS[sampleIndex % SAMPLE_CARS.length] ?? DEFAULT_CAR;
@@ -81,16 +239,50 @@ export function Predictor() {
     setCar(sample);
   };
 
-  const submit = () => {
+  const submit = async () => {
     setLoading(true);
-    window.setTimeout(() => {
-      const prediction = predictPrice(car);
+    setPredictError(null);
+    setAskingError(null);
+    try {
+      const response = await predictCar(car);
+      const prediction = toPredictionResult(car, response);
       setResult(prediction);
       setAsking("");
-      persist([prediction, ...history].slice(0, 20));
-      setLoading(false);
+      pushHistory(prediction);
       document.getElementById("result")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 900);
+    } catch (error) {
+      setPredictError(error instanceof Error ? error.message : "Failed to predict car price.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const analyzeAskingPrice = async () => {
+    if (!result) return;
+
+    const askingPrice = Number(asking.replace(/[^0-9.]/g, ""));
+    if (!(askingPrice > 0)) {
+      setAskingError("Please enter a valid asking price.");
+      return;
+    }
+
+    setAskingLoading(true);
+    setAskingError(null);
+    try {
+      const response = await predictCarWithAsking({
+        ...result.input,
+        asking_price: askingPrice,
+      });
+      const updated = toPredictionResult(result.input, response);
+      setResult(updated);
+      pushHistory(updated);
+    } catch (error) {
+      setAskingError(
+        error instanceof Error ? error.message : "Failed to evaluate asking price.",
+      );
+    } finally {
+      setAskingLoading(false);
+    }
   };
 
   return (
@@ -100,8 +292,8 @@ export function Predictor() {
           <div className="max-w-xl">
             <h2 className="font-display text-3xl sm:text-4xl">Tell us about the car</h2>
             <p className="mt-3 text-muted-foreground">
-              Eleven inputs — the same features the model was trained on. Nothing leaves your
-              browser.
+              Eleven inputs — the same features the model was trained on. Brand/model options and
+              predictions are fetched from the FastAPI backend.
             </p>
           </div>
         </Reveal>
@@ -113,31 +305,55 @@ export function Predictor() {
                 <select
                   className={inputClass}
                   value={car.brand}
+                  disabled={brandsLoading}
                   onChange={(e) => {
                     const brand = e.target.value;
                     setCar((prev) => ({
                       ...prev,
                       brand,
-                      model: BRAND_MODELS[brand]?.[0] ?? "",
+                      model: "",
                     }));
                   }}
                 >
-                  {BRANDS.map((brand) => (
-                    <option key={brand}>{brand}</option>
+                  <option value="" disabled>
+                    {brandsLoading ? "Loading brands..." : "Select brand"}
+                  </option>
+                  {brandOptions.map((brand) => (
+                    <option key={brand} value={brand}>
+                      {brand}
+                    </option>
                   ))}
                 </select>
+                {brandsError ? (
+                  <p className="mt-2 text-xs text-destructive">Unable to load brands: {brandsError}</p>
+                ) : null}
               </Field>
 
               <Field label="Model">
                 <select
                   className={inputClass}
                   value={car.model}
+                  disabled={!car.brand || modelsLoading || modelOptions.length === 0}
                   onChange={(e) => set("model", e.target.value)}
                 >
-                  {models.map((model) => (
-                    <option key={model}>{model}</option>
+                  <option value="" disabled>
+                    {!car.brand
+                      ? "Select brand first"
+                      : modelsLoading
+                        ? "Loading models..."
+                        : modelOptions.length === 0
+                          ? "No models available"
+                          : "Select model"}
+                  </option>
+                  {modelOptions.map((model) => (
+                    <option key={model} value={model}>
+                      {model}
+                    </option>
                   ))}
                 </select>
+                {modelsError ? (
+                  <p className="mt-2 text-xs text-destructive">Unable to load models: {modelsError}</p>
+                ) : null}
               </Field>
 
               <Field
@@ -286,7 +502,7 @@ export function Predictor() {
               <button
                 type="button"
                 onClick={submit}
-                disabled={loading}
+                disabled={loading || !canSubmit}
                 className="cta-gradient inline-flex items-center gap-2 rounded-lg px-7 py-3 font-accent text-sm font-medium text-accent-foreground shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-[var(--shadow-lift)] disabled:opacity-70"
               >
                 {loading ? (
@@ -302,6 +518,9 @@ export function Predictor() {
                 )}
               </button>
             </div>
+            {predictError ? (
+              <p className="mt-3 text-sm text-destructive">Prediction failed: {predictError}</p>
+            ) : null}
           </div>
         </Reveal>
       </section>
@@ -313,6 +532,9 @@ export function Predictor() {
             result={result}
             asking={asking}
             onAsking={setAsking}
+            onAnalyzeAsking={analyzeAskingPrice}
+            askingLoading={askingLoading}
+            askingError={askingError}
           />
         ) : null}
       </div>
@@ -343,7 +565,9 @@ export function Predictor() {
                 type="button"
                 onClick={() => {
                   setCar(entry.input);
-                  setResult(predictPrice(entry.input));
+                  setResult(entry);
+                  setAsking(entry.asking_price ? String(entry.asking_price) : "");
+                  setAskingError(null);
                   document.getElementById("result")?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="surface-card lift min-w-[16rem] shrink-0 snap-start p-5 text-left"
@@ -373,31 +597,34 @@ function ResultBlock({
   result,
   asking,
   onAsking,
+  onAnalyzeAsking,
+  askingLoading,
+  askingError,
 }: {
-  result: Prediction;
+  result: PredictionResult;
   asking: string;
   onAsking: (v: string) => void;
+  onAnalyzeAsking: () => Promise<void>;
+  askingLoading: boolean;
+  askingError: string | null;
 }) {
   const animated = useCountUp(result.predicted_price, 1400);
-  const askingNumber = Number(asking.replace(/[^0-9]/g, ""));
 
   const chartData = useMemo(
     () => [
-      { name: "This car", value: result.predicted_price, key: "self" },
-      { name: "Market avg", value: result.market_average, key: "market" },
-      { name: "Premium avg", value: result.premium_average, key: "premium" },
+      { name: "Low range", value: result.price_range.low, key: "low" },
+      { name: "Predicted", value: result.predicted_price, key: "predicted" },
+      { name: "High range", value: result.price_range.high, key: "high" },
     ],
     [result],
   );
-
-  const deal =
-    askingNumber > 0
-      ? askingNumber <= result.price_range.low
-        ? { tone: "good", label: "Great deal", diff: result.predicted_price - askingNumber }
-        : askingNumber <= result.price_range.high
-          ? { tone: "fair", label: "Fair price", diff: result.predicted_price - askingNumber }
-          : { tone: "high", label: "Overpriced", diff: result.predicted_price - askingNumber }
-      : null;
+  const dealTone = result.deal_status?.toLowerCase().includes("great")
+    ? "good"
+    : result.deal_status?.toLowerCase().includes("fair")
+      ? "fair"
+      : result.deal_status
+        ? "high"
+        : null;
 
   return (
     <section className="mx-auto max-w-6xl animate-rise px-5 pb-6">
@@ -416,12 +643,12 @@ function ResultBlock({
           <div className="mt-8">
             <div className="flex items-center justify-between font-accent text-xs opacity-75">
               <span>Model confidence</span>
-              <span>{Math.round(result.confidence * 100)}%</span>
+              <span>{Math.round(result.confidence_score * 100)}%</span>
             </div>
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-[oklch(1_0_0/0.15)]">
               <div
                 className="h-full rounded-full bg-primary transition-[width] duration-1000 ease-out"
-                style={{ width: `${result.confidence * 100}%` }}
+                style={{ width: `${result.confidence_score * 100}%` }}
               />
             </div>
           </div>
@@ -468,9 +695,9 @@ function ResultBlock({
                       <Cell
                         key={entry.key}
                         fill={
-                          entry.key === "self"
+                          entry.key === "predicted"
                             ? "var(--coral)"
-                            : entry.key === "market"
+                            : entry.key === "low"
                               ? "var(--gold)"
                               : "var(--sage)"
                         }
@@ -494,25 +721,46 @@ function ResultBlock({
               placeholder="e.g. 1850000"
               className={`${inputClass} mt-4`}
             />
+            <button
+              type="button"
+              onClick={() => {
+                void onAnalyzeAsking();
+              }}
+              disabled={askingLoading}
+              className="cta-gradient mt-3 inline-flex items-center gap-2 rounded-lg px-5 py-2.5 font-accent text-sm font-medium text-accent-foreground shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-[var(--shadow-lift)] disabled:opacity-70"
+            >
+              {askingLoading ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Checking deal...
+                </>
+              ) : (
+                "Analyze asking price"
+              )}
+            </button>
+            {askingError ? <p className="mt-3 text-sm text-destructive">{askingError}</p> : null}
 
-            {deal ? (
+            {result.deal_status ? (
               <div
                 className="mt-4 animate-rise rounded-xl p-4"
                 style={{
                   background:
-                    deal.tone === "good"
+                    dealTone === "good"
                       ? "color-mix(in oklab, var(--sage) 18%, transparent)"
-                      : deal.tone === "fair"
+                      : dealTone === "fair"
                         ? "color-mix(in oklab, var(--gold) 18%, transparent)"
                         : "color-mix(in oklab, var(--destructive) 14%, transparent)",
                 }}
               >
-                <p className="font-accent text-sm font-semibold">{deal.label}</p>
+                <p className="font-accent text-sm font-semibold">{result.deal_status}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {deal.diff >= 0
-                    ? `You'd be paying ${formatINR(Math.abs(deal.diff))} below our estimate.`
-                    : `That's ${formatINR(Math.abs(deal.diff))} above our estimate.`}
+                  {result.deal_message}
                 </p>
+                {typeof result.savings === "number" && result.savings > 0 ? (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Estimated savings: {formatINR(result.savings)}
+                  </p>
+                ) : null}
               </div>
             ) : null}
           </article>
